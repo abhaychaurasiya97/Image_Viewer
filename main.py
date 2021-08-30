@@ -1,15 +1,11 @@
 from tkinter import filedialog
 from tkinter import *
-
-
-
 import os
 from PIL import Image,ImageTk
-from pynput.keyboard import Key,Controller,Listener
 
 
-
-
+def convert_image():
+	pass
 def new_image():
 	global img_list
 	global tk_image
@@ -26,7 +22,7 @@ def new_image():
 	image_number.grid_forget()
 	
 	try:
-		path=filedialog.askopenfilename(initialdir=os.getcwd(),title="Select an image file",filetypes=(('Image Files','.jpg'),('Image Files','.gif'),('Image Files','.png'),('Image Files','.tga')))
+		path=filedialog.askopenfilename(initialdir=os.getcwd(),title="Select an image file",filetypes=(('Image Files','.jpg'),('Image Files','.gif'),('Image Files','.png'),('Image Files','.tiff')))
 		folder=path
 		if len(path)>0:
 				
@@ -36,10 +32,6 @@ def new_image():
 		path=path[path.rfind("/")+1:]
 		os.chdir(folder)
 		search_img(folder)
-		print(path)
-		print(folder)
-		print(img_list)
-		
 		put_image=Label(image=ImageTk.PhotoImage(Image.open(path)))
 		put_image.grid(row=0,column=0,columnspan=3,padx=5,pady=5)
 		img_name=Label(root,text=path)
@@ -113,11 +105,11 @@ def forward(image_position):
 root=Tk()
 
 
-root.iconphoto(False, ImageTk.PhotoImage(file='download.png'))
 root.title("My First Image Viewer")
 w, h = root.winfo_screenwidth(), root.winfo_screenheight()
 root.config(bg='#9da4a3')
-root.geometry("500x300+100+100")
+root.overrideredirect(False)
+root.geometry("+100+100")
 valid_img=('.jpg','.gif','.png','.tga')
 img_list=[]
 tk_image=[]
@@ -134,20 +126,16 @@ def search_img(path):
 			img_list.append(files)
 	img_list.sort()
 	for i in img_list:
-		tk_image.append(ImageTk.PhotoImage(Image.open(i)))
+		x,y=Image.open(i).size
+		if x>w or y>h:
+			tk_image.append(ImageTk.PhotoImage(Image.open(i).resize((w,h))))
+		else:
+			tk_image.append(ImageTk.PhotoImage(Image.open(i)))
 		
 	
 search_img(os.getcwd())
 
-
-scrollbar1=Scrollbar(root,orient=VERTICAL)
-scrollbar1.grid(column=4, row=0,rowspan=3, sticky=(N, S))
-scrollbar2=Scrollbar(root,orient=HORIZONTAL)
-scrollbar2.grid(column=0, row=3,columnspan=3, sticky=(E, W))
-
-
 put_image=Label(image=tk_image[0])
-
 back_button=Button(root,text="<<",command=back,state=DISABLED)
 img_name=Label(root,text=img_list[0])
 forward_button=Button(root,text=">>",command=lambda:forward(2))
@@ -160,23 +148,15 @@ back_button.grid(row=1,column=0,padx=10)
 img_name.grid(row=1,column=1,padx=10)
 forward_button.grid(row=1,column=2,padx=10)
 file_size.grid(row=2,column=0,columnspan=3,sticky=W,padx=10,pady=5)
-title_bar=Frame(root)
-title_bar.configure(bg="#9da4a3",bd=10)
-title_bar.grid(row=0,column=00,columnspan=3)
+
 menubar=Menu(root)
 menu_list= Menu(menubar)
 menubar.add_command(label="Open...",command=new_image)
-
-
-
 menubar.add_command(label="Exit",command=root.quit)
-root.bind("<B1-Motion>",move)
-root.bind("<Control-q>",quit)
-
-
 root.configure(menu=menubar)
 root.grid_rowconfigure(0, weight=1) 
 root.grid_columnconfigure(0, weight=1)
-root.grid_columnconfigure(2, weight=1)
 
+root.grid_columnconfigure(2, weight=1)
+root.bind("<Control-w>",quit)
 root.mainloop()
