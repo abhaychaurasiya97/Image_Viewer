@@ -3,7 +3,6 @@ from tkinter import *
 import os
 from PIL import Image,ImageTk
 
-
 def convert_image():
 	pass
 def new_image():
@@ -16,14 +15,15 @@ def new_image():
 	global back_button
 	global image_number
 	
-	img_name.grid_forget()
-	put_image.grid_forget()
-	file_size.grid_forget()
-	image_number.grid_forget()
+	
 	
 	try:
 		path=filedialog.askopenfilename(initialdir=os.getcwd(),title="Select an image file",filetypes=(('Image Files','.jpg'),('Image Files','.gif'),('Image Files','.png'),('Image Files','.tiff')))
 		folder=path
+		img_name.grid_forget()
+		put_image.grid_forget()
+		file_size.grid_forget()
+		image_number.grid_forget()
 		if len(path)>0:
 				
 			img_list.clear()
@@ -134,13 +134,21 @@ def search_img(path):
 		
 	
 search_img(os.getcwd())
+if len(tk_image)==0:
+	img_name=Label(root,text="----")
+	put_image=Label(root,text="No image file is available in this folder")
+	file_size=Label(root,text='0')
+	forward_button=Button(root,text=">>",state=DISABLED)
+else:
+	put_image=Label(image=tk_image[0])
+	img_name=Label(root,text=img_list[0])
+	file_size=Label(root,text=str(round(os.path.getsize(img_list[0])/1024000,3))+"  MB")
 
-put_image=Label(image=tk_image[0])
+
+	forward_button=Button(root,text=">>",command=lambda:forward(2))
 back_button=Button(root,text="<<",command=back,state=DISABLED)
-img_name=Label(root,text=img_list[0])
-forward_button=Button(root,text=">>",command=lambda:forward(2))
 image_number=Label(root,text=f"1 of {len(img_list)}")
-file_size=Label(root,text=str(round(os.path.getsize(img_list[0])/1024000,3))+"  MB")
+
 
 image_number.grid(row=2,column=0,columnspan=3,sticky=E,padx=10,pady=5)
 put_image.grid(row=0,column=0,columnspan=3,padx=5,pady=5)
